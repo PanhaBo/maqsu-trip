@@ -1,0 +1,279 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    background: #000;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    font-family: 'Poppins', 'Khmer', sans-serif;
+    color: #fff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Header */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 16px 20px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.menu-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    cursor: pointer;
+}
+
+.menu-icon span {
+    width: 100%;
+    height: 2px;
+    background: #fff;
+    border-radius: 2px;
+}
+
+/* Destination Label */
+.destination-label {
+    width: 60%;
+    text-align: center;
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 10px 24px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+/* Carousel */
+.carousel-container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+}
+
+.carousel-slide {
+    flex-shrink: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    opacity: 0.3;
+    transition: opacity 0.5s ease;
+}
+
+.carousel-slide.active {
+    opacity: 1;
+}
+
+/* Gradient overlays */
+.carousel-slide::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+    z-index: 1;
+}
+
+.carousel-slide::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60%;
+    background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 50%, transparent 100%);
+    z-index: 1;
+}
+
+/* Content */
+.slide-content {
+    position: relative;
+    z-index: 2;
+    margin-top: auto;
+    padding: 24px 20px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Tag/Duration Badge */
+.duration-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    width: fit-content;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.duration-badge::before {
+    content: "⏱";
+    font-size: 14px;
+}
+
+/* Title */
+.slide-title {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 8px 0;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* Time Range */
+.time-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 400;
+    opacity: 0.9;
+    margin: 4px 0;
+}
+
+.time-range::before {
+    content: "🕐";
+    font-size: 16px;
+}
+
+.time-separator {
+    opacity: 0.5;
+    margin: 0 4px;
+}
+
+/* Description */
+.slide-description {
+    font-size: 15px;
+    line-height: 1.6;
+    font-weight: 400;
+    opacity: 0.85;
+    margin: 8px 0 16px 0;
+    max-width: 90%;
+}
+
+/* CTA Button */
+.cta-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 32px;
+    background: #fff;
+    color: #000;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 100%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    margin-top: 8px;
+}
+
+.cta-button:active {
+    transform: scale(0.98);
+}
+
+.cta-button .arrow {
+    font-size: 20px;
+    transition: transform 0.3s ease;
+}
+
+.cta-button:hover .arrow {
+    transform: translateX(4px);
+}
+
+/* Loading state */
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    height: 100vh;
+    font-size: 18px;
+    opacity: 0.7;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+    .slide-title {
+        font-size: 48px;
+    }
+
+    .slide-description {
+        max-width: 600px;
+        font-size: 16px;
+    }
+
+    .cta-button {
+        width: auto;
+        max-width: 300px;
+    }
+
+    .slide-content {
+        padding: 32px 40px 48px;
+    }
+}
