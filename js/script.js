@@ -235,9 +235,9 @@ fetch(csvUrl)
                     </div>
                     <p class="slide-description">${slideData.activity}</p>
                     <div class="scroll-indicator">
-                        <div class="scroll-arrow">
+                        <div class="scroll-arrow" onclick="scrollToDetails()">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 19V5M5 12l7-7 7 7"/>
+                                <path d="M12 5v14M19 12l-7 7-7-7"/>
                             </svg>
                         </div>
                         <div class="scroll-text">More Information</div>
@@ -494,3 +494,11 @@ setInterval(() => {
         updateSlides();
     }
 }, 60000); // Check every minute
+
+// Scroll to details section when arrow is clicked
+function scrollToDetails() {
+    const detailsSection = document.getElementById('detailsSection');
+    if (detailsSection) {
+        detailsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
