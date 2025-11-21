@@ -905,6 +905,17 @@ body, html {
 
 .category-icon {
     font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.category-icon-svg {
+    width: 32px;
+    height: 32px;
+    color: #000;
+    stroke: currentColor;
+    fill: none;
 }
 
 .category-title {
@@ -1045,4 +1056,120 @@ body, html {
     font-size: 14px;
     font-weight: 400;
     letter-spacing: 0.5px;
+}
+
+/* Mobile Navigation Bar - Glass UI */
+.mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 12px 8px;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    gap: 8px;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 16px;
+    border-radius: 16px;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.6);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    flex: 1;
+    max-width: 120px;
+    min-width: 0;
+}
+
+.nav-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.nav-item:hover::before {
+    opacity: 1;
+}
+
+.nav-item.active {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.nav-item.active::before {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-icon {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+    fill: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-item.active .nav-icon {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+}
+
+.nav-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: 'Kantumruy Pro', 'Poppins', sans-serif;
+}
+
+.nav-item.active .nav-label {
+    font-weight: 600;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Adjust footer padding for mobile nav */
+.footer {
+    padding-bottom: 80px;
+}
+
+/* Hide mobile nav on desktop (optional - adjust breakpoint as needed) */
+@media (min-width: 768px) {
+    .mobile-nav {
+        display: none;
+    }
+    
+    .footer {
+        padding-bottom: 20px;
+    }
+}
+
+/* Ensure content doesn't overlap with mobile nav */
+@media (max-width: 767px) {
+    .details-section {
+        padding-bottom: 80px;
+    }
+    
+    .emergency-page-full {
+        padding-bottom: 80px;
+    }
 }
