@@ -14,6 +14,7 @@ let slides = [];
 let slidesData = [];
 let currentIndex = 0;
 let isTransitioning = false;
+let dateToDayMap = {}; // Maps date strings to day numbers
 
 // Format duration from HH:MM:SS to readable format
 function formatDuration(durationStr) {
@@ -87,6 +88,56 @@ function getCurrentTimeInMinutes() {
     return now.getHours() * 60 + now.getMinutes();
 }
 
+// Check if a slide has passed (its end time is before current time)
+function hasSlidePassed(index) {
+    if (index < 0 || index >= slidesData.length) return false;
+    
+    const slideData = slidesData[index];
+    if (!slideData) return false;
+    
+    const currentTime = getCurrentTimeInMinutes();
+    const currentDate = new Date();
+    const today = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+    
+    // Check if the slide is on a different date
+    const slideDate = slideData.day ? parseDate(slideData.day.trim()) : null;
+    
+    if (slideDate) {
+        // Compare dates (ignoring time)
+        const slideDateOnly = new Date(slideDate.getFullYear(), slideDate.getMonth(), slideDate.getDate());
+        const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        
+        if (slideDateOnly < todayOnly) {
+            // Slide is on a past date
+            return true;
+        } else if (slideDateOnly > todayOnly) {
+            // Slide is on a future date - not passed
+            return false;
+        }
+        // Same date, check time below
+    }
+    
+    // If no end time, can't determine if passed
+    if (!slideData.end) return false;
+    
+    const endTime = timeToMinutes(slideData.end);
+    const startTime = timeToMinutes(slideData.start);
+    
+    // Handle cases where end time is past midnight (activity spans midnight)
+    if (endTime < startTime) {
+        // Activity spans midnight
+        // If current time is before start time, the activity hasn't started yet
+        if (currentTime < startTime) {
+            return false; // Activity hasn't started
+        }
+        // If current time is after end time (which is next day), activity has passed
+        return currentTime >= endTime;
+    }
+    
+    // Normal case: activity doesn't span midnight
+    return currentTime > endTime;
+}
+
 // Find the current destination based on time
 function findCurrentDestinationIndex(data) {
     const currentTime = getCurrentTimeInMinutes();
@@ -123,7 +174,12 @@ function findCurrentDestinationIndex(data) {
 
 // Update timeline - show only items around current index, always centered
 function updateTimeline() {
-    if (slidesData.length === 0) return;
+    if (slidesData.length === 0 || !timelineContainer) return;
+    
+    // Ensure currentIndex is valid
+    if (currentIndex < 0 || currentIndex >= slidesData.length) {
+        currentIndex = Math.max(0, Math.min(currentIndex, slidesData.length - 1));
+    }
     
     const itemsToShow = 5; // Show 5 items: 2 left, 1 center (active), 2 right
     const halfItems = Math.floor(itemsToShow / 2);
@@ -139,16 +195,31 @@ function updateTimeline() {
         endIndex = Math.min(endIndex + adjustment, slidesData.length - 1);
     }
     if (endIndex >= slidesData.length) {
-        const adjustment = endIndex - slidesData.length + 1;
+        const adjustment = endIndex - (slidesData.length - 1);
         endIndex = slidesData.length - 1;
         startIndex = Math.max(0, startIndex - adjustment);
+    }
+    
+    // Final safety check: ensure indices are valid
+    startIndex = Math.max(0, Math.min(startIndex, slidesData.length - 1));
+    endIndex = Math.max(0, Math.min(endIndex, slidesData.length - 1));
+    
+    // Ensure startIndex <= endIndex
+    if (startIndex > endIndex) {
+        startIndex = endIndex;
     }
     
     timelineContainer.innerHTML = '';
     
     // Create timeline items for the visible range
     for (let i = startIndex; i <= endIndex; i++) {
+        // Safety check: ensure index is valid
+        if (i < 0 || i >= slidesData.length) continue;
+        
         const slideData = slidesData[i];
+        // Safety check: ensure slideData exists
+        if (!slideData) continue;
+        
         const timelineItem = document.createElement('div');
         timelineItem.classList.add('timeline-item');
         
@@ -163,19 +234,42 @@ function updateTimeline() {
             timelineItem.classList.add('right-item');
         }
         
+        // Check if this slide has passed and add 'passed' class
+        if (hasSlidePassed(i)) {
+            timelineItem.classList.add('passed');
+        }
+        
+        // Get image URL or use default
+        const defaultImage = 'https://i.postimg.cc/mZ9sfBH8/Cambodia-temple-9.jpg';
+        const imageUrl = slideData.imageUrl && slideData.imageUrl.trim() !== '' 
+            ? slideData.imageUrl.trim() 
+            : defaultImage;
+        
+        // Format time range
+        const timeRange = slideData.start && slideData.end 
+            ? `${slideData.start} — ${slideData.end}`
+            : '';
+        
+        // Get location with fallback
+        const location = slideData.location || 'Unknown Location';
+        
         timelineItem.innerHTML = `
-            <div class="timeline-bullet">
-                <div class="bullet-inner"></div>
-                <div class="bullet-pulse"></div>
+            <div class="timeline-image-container">
+                <img src="${imageUrl}" alt="${location}" class="timeline-image" onerror="this.src='${defaultImage}'" />
             </div>
             <div class="timeline-content">
-                <span class="timeline-location">${slideData.location}</span>
+                <span class="timeline-location">${location}</span>
+                ${timeRange ? `<span class="timeline-time">${timeRange}</span>` : ''}
             </div>
         `;
         
         // Add click handler to navigate to this slide
         timelineItem.addEventListener('click', () => {
             if (!isTransitioning && i !== currentIndex) {
+                // Prevent navigating to slides that have passed
+                if (hasSlidePassed(i)) {
+                    return;
+                }
                 currentIndex = i;
                 updateSlides();
             }
@@ -209,6 +303,9 @@ fetch(csvUrl)
                 googleMap: field("google map") || field("Google Map") || field("googlemap") || field("GoogleMap") || field("Google Maps") || field("google maps") || field("map") || field("Map") || ""
             });
         });
+
+        // Build date to day number mapping
+        buildDateToDayMap();
 
         // Find current destination index
         const currentDestinationIndex = findCurrentDestinationIndex(slidesData);
@@ -348,23 +445,88 @@ function updateSlides() {
 }
 
 // Update header day display
+// Parse date string (DD/MM/YYYY) to Date object for sorting
+function parseDate(dateStr) {
+    if (!dateStr) return null;
+    
+    const trimmed = dateStr.trim();
+    // Check if it's in DD/MM/YYYY format
+    const match = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (match) {
+        const day = parseInt(match[1]);
+        const month = parseInt(match[2]) - 1; // Month is 0-indexed
+        const year = parseInt(match[3]);
+        return new Date(year, month, day);
+    }
+    
+    return null;
+}
+
+// Build date to day number mapping
+function buildDateToDayMap() {
+    dateToDayMap = {};
+    
+    // Collect all unique dates
+    const uniqueDates = new Set();
+    slidesData.forEach(slide => {
+        if (slide.day && slide.day.trim()) {
+            uniqueDates.add(slide.day.trim());
+        }
+    });
+    
+    // Convert to array and sort chronologically
+    const sortedDates = Array.from(uniqueDates).sort((a, b) => {
+        const dateA = parseDate(a);
+        const dateB = parseDate(b);
+        
+        // If both are valid dates, sort by date
+        if (dateA && dateB) {
+            return dateA - dateB;
+        }
+        
+        // If only one is a date, date comes first
+        if (dateA && !dateB) return -1;
+        if (!dateA && dateB) return 1;
+        
+        // If neither is a date, sort alphabetically
+        return a.localeCompare(b);
+    });
+    
+    // Map each date to its day number (1, 2, 3, ...)
+    sortedDates.forEach((date, index) => {
+        dateToDayMap[date] = index + 1;
+    });
+}
+
 function updateHeaderDay() {
     if (slidesData.length === 0 || !headerDay) return;
     
     const currentSlideData = slidesData[currentIndex];
     if (currentSlideData && currentSlideData.day) {
-        // Format day: if it's just a number, add "Day" prefix, otherwise use as is
-        let dayText = currentSlideData.day.trim();
-        // Check if it's just a number (with or without "Day" prefix)
-        if (/^\d+$/.test(dayText)) {
-            // It's just a number, add "Day" prefix
-            headerDay.textContent = `Day ${dayText}`;
-        } else if (!/^day\s+/i.test(dayText)) {
-            // It doesn't start with "Day", add it
-            headerDay.textContent = `Day ${dayText}`;
+        const dayValue = currentSlideData.day.trim();
+        
+        // Check if it's a date format (DD/MM/YYYY)
+        if (parseDate(dayValue)) {
+            // It's a date, look up the day number
+            const dayNumber = dateToDayMap[dayValue];
+            if (dayNumber) {
+                headerDay.textContent = `Day ${dayNumber}`;
+            } else {
+                // Fallback: use the date as is
+                headerDay.textContent = dayValue;
+            }
         } else {
-            // It already has "Day", use as is (but capitalize properly)
-            headerDay.textContent = dayText.charAt(0).toUpperCase() + dayText.slice(1);
+            // It's not a date, check if it's just a number
+            if (/^\d+$/.test(dayValue)) {
+                // It's just a number, add "Day" prefix
+                headerDay.textContent = `Day ${dayValue}`;
+            } else if (!/^day\s+/i.test(dayValue)) {
+                // It doesn't start with "Day", add it
+                headerDay.textContent = `Day ${dayValue}`;
+            } else {
+                // It already has "Day", use as is (but capitalize properly)
+                headerDay.textContent = dayValue.charAt(0).toUpperCase() + dayValue.slice(1);
+            }
         }
         headerDay.style.display = 'block';
     } else {
@@ -473,13 +635,29 @@ function updateDetailsSection() {
 
 function nextSlide() {
     if (isTransitioning || slides.length === 0) return;
-    currentIndex = (currentIndex + 1) % slides.length;
+    
+    // Don't allow sliding forward if we're already on the last page
+    if (currentIndex >= slides.length - 1) {
+        return; // Block navigation - already at last page
+    }
+    
+    currentIndex = currentIndex + 1;
     updateSlides();
 }
 
 function prevSlide() {
     if (isTransitioning || slides.length === 0) return;
-    currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+    
+    // Calculate the immediate previous slide index
+    const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
+    
+    // If the immediate previous slide has passed, don't allow navigation back at all
+    if (hasSlidePassed(prevIndex)) {
+        return; // Block navigation completely
+    }
+    
+    // Only navigate if the previous slide hasn't passed
+    currentIndex = prevIndex;
     updateSlides();
 }
 
