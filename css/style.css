@@ -78,7 +78,7 @@ body, html {
 /* Timeline - Modern Design */
 .timeline-container {
     position: fixed;
-    top: 80px;
+    top: 50px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 100;
@@ -1058,23 +1058,28 @@ body, html {
     letter-spacing: 0.5px;
 }
 
-/* Mobile Navigation Bar - Glass UI */
+/* Mobile Navigation Bar - Floating Glass UI */
 .mobile-nav {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding: 12px 8px;
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    padding: 8px 40px;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
     z-index: 1000;
-    gap: 8px;
+    gap: 12px;
+    max-width: calc(100% - 20px);
+    width: auto;
+    min-width: 320px;
 }
 
 .nav-item {
@@ -1082,15 +1087,15 @@ body, html {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    padding: 8px 16px;
+    gap: 2px;
+    padding: 6px 20px;
     border-radius: 16px;
     text-decoration: none;
     color: rgba(255, 255, 255, 0.6);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     flex: 1;
-    max-width: 120px;
+    max-width: 140px;
     min-width: 0;
 }
 
@@ -1149,7 +1154,7 @@ body, html {
 
 /* Adjust footer padding for mobile nav */
 .footer {
-    padding-bottom: 80px;
+    padding-bottom: 100px;
 }
 
 /* Hide mobile nav on desktop (optional - adjust breakpoint as needed) */
@@ -1166,10 +1171,10 @@ body, html {
 /* Ensure content doesn't overlap with mobile nav */
 @media (max-width: 767px) {
     .details-section {
-        padding-bottom: 80px;
+        padding-bottom: 100px;
     }
     
     .emergency-page-full {
-        padding-bottom: 80px;
+        padding-bottom: 100px;
     }
 }
