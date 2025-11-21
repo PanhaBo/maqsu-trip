@@ -866,7 +866,10 @@ body, html {
 /* Emergency Contact Full Page */
 .emergency-page-full {
     min-height: 100vh;
-    background: linear-gradient(135deg, rgba(34, 139, 34, 0.3) 0%, rgba(0, 100, 0, 0.4) 50%, rgba(0, 50, 0, 0.3) 100%);
+    background-image: url('https://i.postimg.cc/mZ9sfBH8/Cambodia-temple-9.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     padding: 120px 20px 60px;
     position: relative;
 }
@@ -878,7 +881,8 @@ body, html {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: linear-gradient(135deg, rgba(34, 139, 34, 0.4) 0%, rgba(0, 100, 0, 0.5) 50%, rgba(0, 50, 0, 0.4) 100%),
+                rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     z-index: 0;
@@ -900,6 +904,95 @@ body, html {
     padding: 40px 30px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
                 inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+    .emergency-page-full {
+        padding: 100px 15px 60px;
+        background-attachment: scroll;
+    }
+    
+    .emergency-content-full {
+        padding: 30px 20px;
+        border-radius: 20px;
+    }
+    
+    .emergency-header-full {
+        margin-bottom: 40px;
+    }
+    
+    .emergency-header-full h1 {
+        font-size: 32px;
+    }
+    
+    .category-title {
+        font-size: 22px;
+    }
+    
+    .category-contacts {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .emergency-item-full {
+        padding: 20px;
+    }
+    
+    .emergency-name {
+        font-size: 18px;
+    }
+    
+    .emergency-value-full,
+    .emergency-phone,
+    .emergency-telegram {
+        font-size: 16px;
+    }
+    
+    .contact-icon-svg {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .emergency-description {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .emergency-page-full {
+        padding: 80px 10px 60px;
+    }
+    
+    .emergency-content-full {
+        padding: 20px 15px;
+        border-radius: 16px;
+    }
+    
+    .emergency-header-full h1 {
+        font-size: 28px;
+    }
+    
+    .category-title {
+        font-size: 20px;
+    }
+    
+    .emergency-item-full {
+        padding: 16px;
+    }
+    
+    .emergency-name {
+        font-size: 16px;
+    }
+    
+    .emergency-value-full,
+    .emergency-phone,
+    .emergency-telegram {
+        font-size: 14px;
+    }
+    
+    .emergency-contact-row {
+        gap: 8px;
+    }
 }
 
 .emergency-header-full {
@@ -1074,19 +1167,23 @@ body, html {
 .footer {
     width: 100%;
     padding: 24px 20px;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     text-align: center;
     position: relative;
     z-index: 10;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .footer-content {
-    color: rgb(255 255 255 / 50%);
+    color: rgba(255, 255, 255, 0.8);
     font-size: 14px;
     font-weight: 400;
     letter-spacing: 0.5px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 /* Mobile Navigation Bar - Floating Glass UI */
